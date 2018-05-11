@@ -4,6 +4,7 @@ import com.redhat.processor.annotations.HandleMessage;
 import com.redhat.processor.annotations.MessageProcessor;
 import com.redhat.processor.annotations.OutputType;
 import com.redhat.processor.annotations.SourceType;
+import javax.json.JsonObject;
 
 /**
  * Make sure that a reading is within the specified date range
@@ -13,10 +14,10 @@ import com.redhat.processor.annotations.SourceType;
 public class CheckDateInRange {
     @HandleMessage(
             configSource = SourceType.SPECIFIED, 
-            inputName = "processor.in", 
-            outputName = "processor.out", 
+            inputName = "datefilter.in", 
+            outputName = "datefilter.out", 
             outputType = OutputType.TOPIC)
-    public Object checkDate(Object input){
+    public JsonObject checkDate(JsonObject input){
         return input;
     }
 }

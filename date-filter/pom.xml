@@ -12,7 +12,12 @@
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
     
-    
+    <parent>
+        <groupId>org.jboss</groupId>
+        <artifactId>jboss-parent</artifactId>
+        <version>26</version>
+    </parent>
+        
     <dependencies>
         <dependency>
             <groupId>com.redhat</groupId>
@@ -86,7 +91,7 @@
                         </env>
                     </resources>
                 </configuration>
-            </plugin>
+            </plugin> 
                                 
         </plugins>
     </build>

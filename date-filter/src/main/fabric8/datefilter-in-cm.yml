@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: processor.in
+  name: datefilter.in
   labels:
     strimzi.io/kind: topic
     strimzi.io/cluster: my-cluster
 data:
-  name: processor.in
-  partitions: "2"
+  name: datefilter.in
+  partitions: "1"
   replicas: "1"
 
