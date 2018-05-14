@@ -19,11 +19,10 @@ public class CLNRConsumer {
     /**
      * Simple listener that receives messages from the Kafka broker
      * <p>
-     * Todo: The @Consumer annotation doesn't support environment variable injection yet. Update to parameterise when it does.
      */
     @Consumer(topics = "#{CONSUMER_INPUT_TOPIC}", groupId = "123")
     public void receiver(final String key, final JsonObject value) {
-        logger.info("Id: " + key + ", Timestamp: " + value.getString("date") + ", kWh: " + value.getString("kWh"));
+        logger.info("Id: " + key + ", Timestamp: " + value.getString("date") + ", kWh: " + value.get("kWh"));
     }
 
 }

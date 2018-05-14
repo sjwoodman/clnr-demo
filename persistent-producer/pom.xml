@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>persistent-producer</artifactId>
+    <groupId>com.redhat.demo.clnr</groupId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>war</packaging>
+
+    <build>
+        <finalName>persistent-producer</finalName>
+
+        <resources>
+            <resource>
+                <directory>src/main/config-openshift</directory>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.bsc.maven</groupId>
+                <artifactId>maven-processor-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>process</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>process</goal>
+                        </goals>
+                        <configuration>
+                            <processors>
+                                <processor>org.hibernate.jpamodelgen.JPAMetaModelEntityProcessor</processor>
+                            </processors>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.hibernate</groupId>
+                        <artifactId>hibernate-jpamodelgen</artifactId>
+                        <version>5.2.7.Final</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
+                <configuration>
+                    <proc>none</proc>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.wildfly.swarm</groupId>
+                <artifactId>wildfly-swarm-plugin</artifactId>
+                <version>${version.wildfly-swarm}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>package</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <properties>
+                        <java.net.preferIPv4Stack>true</java.net.preferIPv4Stack>
+                    </properties>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>fabric8-maven-plugin</artifactId>
+                <version>3.1.92</version>
+                <executions>
+                    <execution>
+                        <id>fmp</id>
+                        <goals>
+                            <goal>resource</goal>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <generator>
+                        <includes>
+                            <include>wildfly-swarm</include>
+                        </includes>
+                    </generator>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
+            <scope>provided</scope>
+            <version>7.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-jpamodelgen</artifactId>
+            <version>5.2.7.Final</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.wildfly.swarm</groupId>
+            <artifactId>ejb</artifactId>
+            <version>${version.wildfly-swarm}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.wildfly.swarm</groupId>
+            <artifactId>jaxrs-jaxb</artifactId>
+            <version>${version.wildfly-swarm}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.wildfly.swarm</groupId>
+            <artifactId>jpa</artifactId>
+            <version>${version.wildfly-swarm}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.40</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.aerogear.kafka</groupId>
+            <artifactId>kafka-cdi-extension</artifactId>
+            <version>0.0.11</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.wildfly.swarm</groupId>
+            <artifactId>microprofile</artifactId>
+            <version>${version.wildfly-swarm}</version>
+        </dependency>
+    </dependencies>
+
+    <properties>
+        <failOnMissingWebXml>false</failOnMissingWebXml>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <version.wildfly-swarm>2017.9.4</version.wildfly-swarm>
+    </properties>
+</project>
