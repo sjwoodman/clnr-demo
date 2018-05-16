@@ -22,7 +22,7 @@ public class CLNRConsumer {
      */
     @Consumer(topics = "#{CONSUMER_INPUT_TOPIC}", groupId = "2")
     public void receiver(final String key, final JsonObject value) {
-        logger.info("Id: " + key + ", Timestamp: " + value.getString("date") + ", kWh: " + value.get("kWh"));
+        logger.info("Id: " + key + ", Timestamp: " + value.getString("timestamp") + ", kWh: " + value.get("kWh"));
     }
 
 }

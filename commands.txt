@@ -29,7 +29,7 @@ oc exec -it my-cluster-kafka-0 -- /opt/kafka/bin/kafka-console-consumer.sh \
    --bootstrap-server localhost:9092 \
    --from-beginning \
    --property print.key=true \
-   --topic ingest-api.out
+   --topic ingest.api.out
 
    #Setup command line for outside Openshift
    export KAFKA_SERVICE_HOST=localhost;

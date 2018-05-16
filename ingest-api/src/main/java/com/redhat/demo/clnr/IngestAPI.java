@@ -20,7 +20,7 @@ public class IngestAPI {
     private final static Logger logger = Logger.getLogger(IngestAPI.class.getName());
 
     @Producer
-    private SimpleKafkaProducer<String, JsonObject> myproducer;
+    private SimpleKafkaProducer<String, Reading> myproducer;
 
     private static final String OUTPUT_TOPIC = System.getenv("INGEST_API_OUT");
 
@@ -72,12 +72,7 @@ public class IngestAPI {
 
     private void sendReading(Reading r) {
 
-        //Send a JSON object with the timestamp and kWh values
-        JsonObject reading = Json.createObjectBuilder()
-                .add("date", r.getTimestamp())
-                .add("kWh", r.getkWh())
-                .build();
-        myproducer.send(OUTPUT_TOPIC, r.getCustomerId(), reading);
+        myproducer.send(OUTPUT_TOPIC, r.getCustomerId(), r);
 
     }
 }

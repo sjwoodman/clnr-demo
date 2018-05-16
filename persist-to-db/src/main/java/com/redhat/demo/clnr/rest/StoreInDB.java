@@ -23,16 +23,10 @@ public class StoreInDB {
     private EntityManager em;
 
     @Consumer(topics = "#{PERSIST_DB_IN}", groupId = "1")
-    public void receiver(final String key, final JsonObject value) {
-
-        Reading r = new Reading();
-        r.setCustomerId(key);
-        r.setTimestamp(value.getString("date"));
-        JsonNumber j  = value.getJsonNumber("kWh");
-        r.setkWh(j.doubleValue());
+    public void receiver(final String key, final Reading r) {
 
         em.persist(r);
 
-        logger.info("Id: " + key + ", Timestamp: " + value.getString("date") + ", kWh: " + value.get("kWh"));
+        logger.info("Id: " + key + ", Timestamp: " + r.getTimestamp() + ", kWh: " + r.getkWh());
     }
 }
