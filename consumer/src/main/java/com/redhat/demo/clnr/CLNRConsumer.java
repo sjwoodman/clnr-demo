@@ -20,7 +20,7 @@ public class CLNRConsumer {
      * Simple listener that receives messages from the Kafka broker
      * <p>
      */
-    @Consumer(topics = "#{CONSUMER_INPUT_TOPIC}", groupId = "123")
+    @Consumer(topics = "#{CONSUMER_INPUT_TOPIC}", groupId = "2")
     public void receiver(final String key, final JsonObject value) {
         logger.info("Id: " + key + ", Timestamp: " + value.getString("date") + ", kWh: " + value.get("kWh"));
     }
