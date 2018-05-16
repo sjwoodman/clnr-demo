@@ -1,3 +1,6 @@
+Potentially Useful commands
+--
+
 #Setup command line for outside Openshift
 export KAFKA_SERVICE_HOST=localhost;
 export KAFKA_SERVICE_PORT=9092;
@@ -26,5 +29,47 @@ oc exec -it my-cluster-kafka-0 -- /opt/kafka/bin/kafka-console-consumer.sh \
    --bootstrap-server localhost:9092 \
    --from-beginning \
    --property print.key=true \
-   --topic producer.out
+   --topic ingest.api.out
+
+   #Setup command line for outside Openshift
+   export KAFKA_SERVICE_HOST=localhost;
+   export KAFKA_SERVICE_PORT=9092;
+   export PRODUCER_OUTPUT_TOPIC=producer.out;
+   export CONSUMER_INPUT_TOPIC=producer.out;
+
+   #Create the topic
+   bin/kafka-topics.sh --create \
+       --zookeeper localhost:2181 \
+       --replication-factor 1 \
+       --partitions 1 \
+       --topic producer.out
+
+   #Consume a local topic
+   bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 \
+       --topic producer.out \
+       --from-beginning \
+       --formatter kafka.tools.DefaultMessageFormatter \
+       --property print.key=true \
+       --property print.value=true \
+       --property key.deserializer=org.apache.kafka.common.serialization.StringDeserializer \
+       --property value.deserializer=org.apache.kafka.common.serialization.StringDeserializer
+
+   #Consume an Openshift topic
+   oc exec -it my-cluster-kafka-0 -- /opt/kafka/bin/kafka-console-consumer.sh \
+      --bootstrap-server localhost:9092 \
+      --from-beginning \
+      --property print.key=true \
+      --topic producer.out
+
+
+   $ oc new-app --name=mysql debezium/example-mysql:0.7
+   $ oc env dc/mysql MYSQL_ROOT_PASSWORD=debezium MYSQL_USER=mysqluser MYSQL_PASSWORD=mysqlpw
+
+
+   oc new-app --template=mysql-persistent \
+       -p MYSQL_USER=mysql \
+       -p MYSQL_PASSWORD=mysql \
+       -p MYSQL_DATABASE=reading
+
+
 
