@@ -1,6 +1,5 @@
 #!/bin/bash
 
-#TODO: Get the URL from oc get route
 [ -z "$PRODUCER_URL" ] && echo "Need to set PRODUCER_URL" && exit 1;
 
 echo "Sending data to ${PRODUCER_URL}"
