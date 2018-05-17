@@ -1,8 +1,10 @@
 package com.redhat.demo.clnr;
 
 import com.redhat.demo.clnr.operations.CSVKeyExtractor;
+import com.redhat.demo.clnr.operations.CSVTimestampExtractor;
 import com.redhat.demo.clnr.operations.MeterReadingParser;
 import com.redhat.demo.clnr.operations.MeterReadingTimstampExtractor;
+import java.text.SimpleDateFormat;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.Consumed;
 import org.apache.kafka.streams.StreamsBuilder;
@@ -19,22 +21,19 @@ import org.apache.kafka.streams.kstream.Serialized;
  * @author hhiden
  */
 public class ProcessingPipe {
+
     private String inputStreamName;
-    
+
     public ProcessingPipe(String inputStreamName) {
         this.inputStreamName = inputStreamName;
     }
 
-    public KStream<String, String> getSourceStream(){
-        StreamsBuilder builder = new StreamsBuilder();
-        return builder.<String, String>stream(inputStreamName, Consumed.with(Serdes.String(), Serdes.String()));//.withTimestampExtractor(new MeterReadingTimstampExtractor()));
-    }
-    
     public Topology getTopology() {
-        final StreamsBuilder builder = new StreamsBuilder();
-        KStream<String, String> source = getSourceStream();
 
-        source.selectKey(new CSVKeyExtractor(0))
+        final StreamsBuilder builder = new StreamsBuilder();
+        CSVTimestampExtractor extractor = new CSVTimestampExtractor(3, new SimpleDateFormat("mm/dd/yyyy HH:mm:ss"));
+        builder.<String, String>stream(inputStreamName, Consumed.with(Serdes.String(), Serdes.String()).withTimestampExtractor(extractor))
+                .selectKey(new CSVKeyExtractor(0))
                 .flatMapValues(new MeterReadingParser())
                 .groupByKey(Serialized.with(new Serdes.StringSerde(), new MeterReadingSerde()))
                 .aggregate(new Initializer<CustomerRecord>() {

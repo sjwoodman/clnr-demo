@@ -123,38 +123,9 @@ public class TestStream {
         props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
         props.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, 1000);
 
-        
-        final StreamsBuilder builder = new StreamsBuilder();
-        CSVTimestampExtractor extractor = new CSVTimestampExtractor(3, new SimpleDateFormat("mm/dd/yyyy HH:mm:ss"));
-        builder.<String, String>stream("stream-meter-readings-input", Consumed.with(Serdes.String(), Serdes.String()).withTimestampExtractor(extractor))
-                .selectKey(new CSVKeyExtractor(0))
-                .flatMapValues(new MeterReadingParser())
-                .groupByKey(Serialized.with(new Serdes.StringSerde(), new MeterReadingSerde()))
-                .aggregate(new Initializer<CustomerRecord>() {
-                    @Override
-                    public CustomerRecord apply() {
-                        return new CustomerRecord();
-                    }
-                }, new Aggregator<String, MeterReading, CustomerRecord>() {
-                    @Override
-                    public CustomerRecord apply(String key, MeterReading value, CustomerRecord aggregate) {
-                        return aggregate;
-                    }
-                }, new CustomerRecordSerde())
-                .toStream()
-                .foreach(new ForeachAction<String, CustomerRecord>() {
-                    @Override
-                    public void apply(String key, CustomerRecord value) {
-                        System.out.println(key + "=" + value);
-                    }
-                });
-
-
-        final Topology topology = builder.build();
-        final KafkaStreams streams = new KafkaStreams(topology, props);
-        
-        //ProcessingPipe pipe = new ProcessingPipe("stream-meter-readings-input");
-        //KafkaStreams streams = new KafkaStreams(pipe.getTopology(), props);
+        // Create the pipeline
+        ProcessingPipe pipe = new ProcessingPipe("stream-meter-readings-input");
+        KafkaStreams streams = new KafkaStreams(pipe.getTopology(), props);
         streams.start();
         producerThread.start();
 
