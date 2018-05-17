@@ -19,6 +19,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Properties;
@@ -81,7 +82,7 @@ public class TestStream {
     @BeforeClass
     public static void setUpClass() throws Exception {
         cluster = kafkaCluster().addBrokers(1).startup();
-        producerThread = new DataProducer(new File("/Users/hhiden/data.csv"), "stream-meter-readings-input");
+        producerThread = new DataProducer("stream-meter-readings-input");
     }
 
     @AfterClass
@@ -170,12 +171,9 @@ public class TestStream {
     }
 
     private static class DataProducer extends Thread {
-
-        private File dataFile;
         private String topic;
 
-        public DataProducer(File dataFile, String topic) {
-            this.dataFile = dataFile;
+        public DataProducer(String topic) {
             this.topic = topic;
             setDaemon(true);
         }
@@ -183,6 +181,10 @@ public class TestStream {
         @Override
         public void run() {
             logger.info("Starting DataProducer Thread");
+            URL url = TestStream.class.getResource("/data.csv");
+            File dataFile = new File(url.getFile());
+            logger.info(dataFile.getPath());
+            
             KafkaProducer<String, String> producer = createProducer();
             try (FileReader fileReader = new FileReader(dataFile)) {
                 try (BufferedReader reader = new BufferedReader(fileReader)) {
