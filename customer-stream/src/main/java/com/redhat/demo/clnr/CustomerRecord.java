@@ -21,6 +21,7 @@ public class CustomerRecord implements Serializable {
     }
     
     private void initHourBins(){
+        hourBins = new HashMap<>();
         for(int i=0;i<23;i++){
             hourBins.put(i, 0.0);
         }

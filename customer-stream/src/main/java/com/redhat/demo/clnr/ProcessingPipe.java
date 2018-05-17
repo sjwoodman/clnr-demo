@@ -1,6 +1,8 @@
 package com.redhat.demo.clnr;
 
-import java.util.Collections;
+import com.redhat.demo.clnr.operations.CSVKeyExtractor;
+import com.redhat.demo.clnr.operations.MeterReadingParser;
+import com.redhat.demo.clnr.operations.MeterReadingTimstampExtractor;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.Consumed;
 import org.apache.kafka.streams.StreamsBuilder;
@@ -8,9 +10,8 @@ import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.Aggregator;
 import org.apache.kafka.streams.kstream.ForeachAction;
 import org.apache.kafka.streams.kstream.Initializer;
-import org.apache.kafka.streams.kstream.KeyValueMapper;
+import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Serialized;
-import org.apache.kafka.streams.kstream.ValueMapperWithKey;
 
 /**
  * Builds the data processing pipeline for meter readings
@@ -24,22 +25,17 @@ public class ProcessingPipe {
         this.inputStreamName = inputStreamName;
     }
 
+    public KStream<String, String> getSourceStream(){
+        StreamsBuilder builder = new StreamsBuilder();
+        return builder.<String, String>stream(inputStreamName, Consumed.with(Serdes.String(), Serdes.String()));//.withTimestampExtractor(new MeterReadingTimstampExtractor()));
+    }
+    
     public Topology getTopology() {
         final StreamsBuilder builder = new StreamsBuilder();
+        KStream<String, String> source = getSourceStream();
 
-        builder.<String, String>stream(inputStreamName, Consumed.with(Serdes.String(), Serdes.String()))
-                .selectKey(new KeyValueMapper<String, String, String>() {
-                    @Override
-                    public String apply(String key, String value) {
-                        return new MeterReading(value).customerId;
-                    }
-                })
-                .flatMapValues(new ValueMapperWithKey<String, String, Iterable<MeterReading>>() {
-                    @Override
-                    public Iterable<MeterReading> apply(String readOnlyKey, String value) {
-                        return Collections.singletonList(new MeterReading(value));
-                    }
-                })
+        source.selectKey(new CSVKeyExtractor(0))
+                .flatMapValues(new MeterReadingParser())
                 .groupByKey(Serialized.with(new Serdes.StringSerde(), new MeterReadingSerde()))
                 .aggregate(new Initializer<CustomerRecord>() {
                     @Override
