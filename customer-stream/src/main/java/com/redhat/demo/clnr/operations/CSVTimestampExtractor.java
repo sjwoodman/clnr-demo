@@ -29,8 +29,9 @@ public class CSVTimestampExtractor implements TimestampExtractor {
             String value = record.value().toString();
             String[] parts = value.split(",");
             String timestampText = parts[index];
-            Date timestamp = format.parse(timestampText);
-            return timestamp.getTime();
+            long ts = format.parse(timestampText).getTime();
+            Date nd = new Date(ts);
+            return ts;
         } catch (Exception e){
             e.printStackTrace();
             return 0;

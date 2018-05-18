@@ -10,7 +10,7 @@ import java.util.Date;
  * @author hhiden
  */
 public class MeterReading implements Serializable {
-    private static final SimpleDateFormat format = new SimpleDateFormat("mm/dd/yyyy HH:mm:ss");
+    private static final SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
     
     public String customerId;
     public Date timestamp;

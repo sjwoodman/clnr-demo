@@ -5,23 +5,13 @@
  */
 package com.redhat.demo.clnr.tests;
 
-import com.redhat.demo.clnr.CustomerRecord;
-import com.redhat.demo.clnr.CustomerRecordSerde;
-import com.redhat.demo.clnr.MeterReading;
-import com.redhat.demo.clnr.MeterReadingSerde;
 import com.redhat.demo.clnr.ProcessingPipe;
-import com.redhat.demo.clnr.operations.CSVKeyExtractor;
-import com.redhat.demo.clnr.operations.CSVTimestampExtractor;
-import com.redhat.demo.clnr.operations.MeterReadingParser;
-import com.redhat.demo.clnr.operations.MeterReadingTimstampExtractor;
 import io.debezium.kafka.KafkaCluster;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.Properties;
 import java.util.logging.Logger;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -29,17 +19,8 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.apache.kafka.streams.Consumed;
 import org.apache.kafka.streams.KafkaStreams;
-import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
-import org.apache.kafka.streams.Topology;
-import org.apache.kafka.streams.kstream.Aggregator;
-import org.apache.kafka.streams.kstream.ForeachAction;
-import org.apache.kafka.streams.kstream.Initializer;
-import org.apache.kafka.streams.kstream.KeyValueMapper;
-import org.apache.kafka.streams.kstream.Serialized;
-import org.apache.kafka.streams.kstream.ValueMapperWithKey;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -129,7 +110,8 @@ public class TestStream {
         streams.start();
         producerThread.start();
 
-        Thread.sleep(5000); //Noooo
+        Thread.sleep(60000); //Noooo
+        System.exit(0);
     }
 
     private static KafkaProducer<String, String> createProducer() {
