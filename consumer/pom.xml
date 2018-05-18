@@ -2,61 +2,37 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.redhat.demo.clnr</groupId>
-    <artifactId>consumer</artifactId>
-    <name>consumer</name>
+
+  <parent>
+    <groupId>com.redhat.datastreaming</groupId>
+    <artifactId>clnr-demo</artifactId>
     <version>1.0.0-SNAPSHOT</version>
-    <packaging>war</packaging>
+  </parent>
+  <artifactId>vanilla-consumer</artifactId>
+  <packaging>war</packaging>
 
-    <properties>
-        <version.wildfly.swarm>2017.9.4</version.wildfly.swarm>
-        <kafka-cdi.version>0.0.12</kafka-cdi.version>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <failOnMissingWebXml>false</failOnMissingWebXml>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <fabric8.generator.name>redhat-clnr/${project.artifactId}:latest</fabric8.generator.name>
+    <dependencies>
+        <!-- WildFly Swarm Fractions -->
+        <dependency>
+            <groupId>org.wildfly.swarm</groupId>
+            <artifactId>microprofile</artifactId>
+        </dependency>
 
-    </properties>
+        <dependency>
+            <groupId>org.aerogear.kafka</groupId>
+            <artifactId>kafka-cdi-extension</artifactId>
+        </dependency>
+    </dependencies>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.wildfly.swarm</groupId>
-                <artifactId>bom-all</artifactId>
-                <version>${version.wildfly.swarm}</version>
-                <scope>import</scope>
-                <type>pom</type>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
-    <build>
-        <finalName>consumer</finalName>
-
+  <profiles>
+    <profile>
+      <id>openshift</id>
+      <build>
         <plugins>
-            <plugin>
-                <groupId>org.wildfly.swarm</groupId>
-                <artifactId>wildfly-swarm-plugin</artifactId>
-                <version>${version.wildfly.swarm}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>package</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <properties>
-                        <java.net.preferIPv4Stack>true</java.net.preferIPv4Stack>
-                    </properties>
-                </configuration>
-            </plugin>
-
             <plugin>
                 <groupId>io.fabric8</groupId>
                 <artifactId>fabric8-maven-plugin</artifactId>
-                <version>3.5.33</version>
+                <version>${version.fmp}</version>
                 <executions>
                     <execution>
                         <goals>
@@ -75,33 +51,13 @@
                         <env>
                             <KAFKA_SERVICE_HOST>my-cluster-kafka</KAFKA_SERVICE_HOST>
                             <KAFKA_SERVICE_PORT>9092</KAFKA_SERVICE_PORT>
-                            <CONSUMER_INPUT_TOPIC>producer.out</CONSUMER_INPUT_TOPIC>
+                            <INGEST_API_OUT>ingest.api.out</INGEST_API_OUT>
                         </env>
                     </resources>
                 </configuration>
             </plugin>
         </plugins>
-    </build>
-
-    <dependencies>
-        <!-- Java EE 7 dependency -->
-        <dependency>
-            <groupId>javax</groupId>
-            <artifactId>javaee-api</artifactId>
-            <version>7.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <!-- WildFly Swarm Fractions -->
-        <dependency>
-            <groupId>org.wildfly.swarm</groupId>
-            <artifactId>microprofile</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.aerogear.kafka</groupId>
-            <artifactId>kafka-cdi-extension</artifactId>
-            <version>${kafka-cdi.version}</version>
-        </dependency>
-
-    </dependencies>
+      </build>
+    </profile>
+  </profiles>
 </project>
