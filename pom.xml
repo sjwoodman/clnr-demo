@@ -20,7 +20,6 @@
     </properties>
 
    <modules>
-       <module>consumer</module>
        <module>ingest-api</module>
        <module>persist-to-db</module>
    </modules>    
