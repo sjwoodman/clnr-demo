@@ -2,6 +2,7 @@ package com.redhat.demo.clnr;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Map;
@@ -36,13 +37,15 @@ public class CustomerRecordSerde implements Serde<CustomerRecord> {
 
             @Override
             public byte[] serialize(String string, CustomerRecord t) {
-                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-                try (ObjectOutputStream outStream = new ObjectOutputStream(buffer)) {
-                    outStream.writeObject(t);
-                } catch (Exception e) {
-                    e.printStackTrace();
+                try (ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
+                    try (ObjectOutputStream outStream = new ObjectOutputStream(buffer)) {
+                        outStream.writeObject(t);
+                    }
+                    return buffer.toByteArray();
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
+                    return new byte[0];
                 }
-                return buffer.toByteArray();
             }
 
             @Override
@@ -62,9 +65,10 @@ public class CustomerRecordSerde implements Serde<CustomerRecord> {
 
             @Override
             public CustomerRecord deserialize(String string, byte[] bytes) {
-                ByteArrayInputStream buffer = new ByteArrayInputStream(bytes);
-                try (ObjectInputStream inStream = new ObjectInputStream(buffer)) {
-                    return (CustomerRecord) inStream.readObject();
+                try (ByteArrayInputStream buffer = new ByteArrayInputStream(bytes)){
+                    try (ObjectInputStream inStream = new ObjectInputStream(buffer)) {
+                        return (CustomerRecord) inStream.readObject();
+                    }                    
                 } catch (Exception e) {
                     e.printStackTrace();
                     return null;
