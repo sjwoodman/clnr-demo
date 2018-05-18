@@ -22,7 +22,7 @@
    <modules>
        <module>ingest-api</module>
        <module>persist-to-db</module>
-   </modules>    
+   </modules>
 
     <dependencyManagement>
         <dependencies>
@@ -43,6 +43,17 @@
     </dependencyManagement>
 
     <build>
+        <pluginManagement>
+            <plugins>
+
+                <plugin>
+                    <groupId>io.fabric8</groupId>
+                    <artifactId>fabric8-maven-plugin</artifactId>
+                    <version>${version.fmp}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
         <plugins>
             <plugin>
                 <groupId>org.wildfly.swarm</groupId>
