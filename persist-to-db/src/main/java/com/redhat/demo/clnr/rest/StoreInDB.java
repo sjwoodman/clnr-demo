@@ -14,12 +14,11 @@ import java.util.logging.Logger;
 
 @Stateless
 @KafkaConfig(bootstrapServers = "#{KAFKA_SERVICE_HOST}:#{KAFKA_SERVICE_PORT}")
-
 public class StoreInDB {
 
     private final static Logger logger = Logger.getLogger(StoreInDB.class.getName());
 
-    @PersistenceContext(unitName = "reading-persistence-unit")
+    @PersistenceContext(unitName = "MyPU")
     private EntityManager em;
 
     @Consumer(topics = "#{PERSIST_DB_IN}", groupId = "1")
