@@ -17,6 +17,7 @@
         <failOnMissingWebXml>false</failOnMissingWebXml>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <fabric8.generator.name>redhat-clnr/${project.artifactId}:latest</fabric8.generator.name>
+        <version.postgresql>9.4.1207</version.postgresql>
     </properties>
 
    <modules>
@@ -59,8 +60,6 @@
                 <configuration>
                     <properties>
                         <java.net.preferIPv4Stack>true</java.net.preferIPv4Stack>
-                        <!-- Needed to run outside of OCP -->
-                        <!--<swarm.http.port>8081</swarm.http.port>-->
                     </properties>
                 </configuration>
             </plugin>
