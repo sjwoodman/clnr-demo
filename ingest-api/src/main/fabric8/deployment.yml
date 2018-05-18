@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Deployment
+metadata:
+  name: ${project.artifactId}
+spec:
+  template:
+    spec:
+      containers:
+        - env:
+            - name: KAFKA_SERVICE_HOST
+              value: "my-cluster-kafka"
+            - name: KAFKA_SERVICE_PORT
+              value: "9092"
+            - name: INGEST_API_OUT
+              value: "ingest.api.out"
