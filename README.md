@@ -18,17 +18,14 @@ the demo this will be monitored by Debezium.
 
 ## Running the example
 
-In order to run this example you need to deploy a MySQL application into your project.
+In order to run this example you need to deploy a Postgres database into your project.
 This can be achieved with the following command
 
 ```bash
-oc new-app --template=mysql-persistent \
-       -p MYSQL_USER=mysql \
-       -p MYSQL_PASSWORD=mysql \
-       -p MYSQL_DATABASE=reading
+oc new-app -e POSTGRESQL_USER=luke -ePOSTGRESQL_PASSWORD=secret -ePOSTGRESQL_DATABASE=my_data openshift/postgresql-92-centos7 --name=my-database
 ```  
 
-Once the MySQL container has started the IngestAPI and PersistToDB containers can be deployed using the 
+Once the Postgres has started the IngestAPI and PersistToDB containers can be deployed using the 
 command `mvn clean package fabric8:deploy` from the module directories.
 
 There is a script in the IngestAPI project which will send sample data to the application. Set the `INGEST_URL` 
