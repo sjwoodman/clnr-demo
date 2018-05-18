@@ -1,6 +1,5 @@
 package com.redhat.demo.clnr;
 
-import javax.persistence.*;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.util.Objects;
