@@ -3,7 +3,8 @@
 [ -z "$INGEST_URL" ] && echo "Need to set INGEST_URL" && exit 1;
 
 echo "Sending data to ${INGEST_URL}"
-cat clnr.txt | while read line
+
+cat $1 | while read line
 do
     if [[ $line != \#* ]] ; then
 
