@@ -113,9 +113,9 @@ public class TestStream {
         // Create the pipeline
         ProcessingPipe pipe = new ProcessingPipe("stream-meter-readings-input");
         KafkaStreams streams = new KafkaStreams(pipe.getTopology(), props);
-        
+
         streams.start();
-        
+
         producerThread.start();
         Thread.sleep(5000);
         queryThread = new QueryThread(streams);
@@ -135,45 +135,36 @@ public class TestStream {
     }
 
     private static class QueryThread extends Thread {
+
         KafkaStreams streams;
         String key = "120";
         String startDateText = "13/11/2011 00:00:00";
-        String endDateText= "04/12/2011 23:59:00";
-        
+        String endDateText = "04/12/2011 23:59:00";
+
         public QueryThread(KafkaStreams streams) {
             this.streams = streams;
             setDaemon(true);
         }
-        
-        
+
         @Override
         public void run() {
-            
-            // Query every second
             try {
                 Date startDate = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(startDateText);
-                Date endDate = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(endDateText);
-                
-                while(true){
-                    try {
-                        ReadOnlyWindowStore store = streams.store("sum-store", QueryableStoreTypes.windowStore());
-                        WindowStoreIterator i = store.fetch(key, startDate.getTime(), endDate.getTime());
-                        while(i.hasNext()){
-                            KeyValue row = (KeyValue)i.next();
-                            System.out.println(row.value);
-                        }
-                    } catch (Exception e2){
-                        
-                    }
-                    Thread.sleep(5000);
+                Date endDate = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(endDateText);                
+                ReadOnlyWindowStore store = streams.store("sum-store", QueryableStoreTypes.windowStore());
+                WindowStoreIterator i = store.fetch(key, startDate.getTime(), endDate.getTime());
+                while (i.hasNext()) {
+                    KeyValue row = (KeyValue) i.next();
+                    System.out.println(row.value);
                 }
-            } catch (Exception e){
-                e.printStackTrace();
+            } catch (Exception e2) {
+
             }
         }
-        
     }
+
     private static class DataProducer extends Thread {
+
         private String topic;
 
         public DataProducer(String topic) {
@@ -187,7 +178,7 @@ public class TestStream {
             URL url = TestStream.class.getResource("/data.csv");
             File dataFile = new File(url.getFile());
             logger.info(dataFile.getPath());
-            
+
             KafkaProducer<String, String> producer = createProducer();
             try (FileReader fileReader = new FileReader(dataFile)) {
                 try (BufferedReader reader = new BufferedReader(fileReader)) {
