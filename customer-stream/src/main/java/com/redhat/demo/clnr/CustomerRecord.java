@@ -1,6 +1,7 @@
 package com.redhat.demo.clnr;
 
 import java.io.Serializable;
+import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,8 +10,9 @@ import java.util.Map;
  * @author hhiden
  */
 public class CustomerRecord implements Serializable {
+    public static final long serialVersionUID = 0L;
     public String customerId;
-    private Map<Integer, Double> hourBins;
+    public HashMap<Integer, Double> hourBins = new HashMap<>();
 
     public CustomerRecord() {
         initHourBins();
@@ -21,11 +23,44 @@ public class CustomerRecord implements Serializable {
         initHourBins();
     }
     
+    public CustomerRecord update(MeterReading reading){
+        try {
+            if(customerId==null){
+                customerId = reading.customerId;
+            }
+            int hour = reading.getHourOfDay();
+            double existing = hourBins.get(hour);
+            hourBins.put(hour, existing + reading.value);
+            return this;
+        } catch (Exception e){
+            e.printStackTrace();
+            return this;
+        }
+    }
+    
     private void initHourBins(){
-        hourBins = new HashMap<>();
-        for(int i=0;i<23;i++){
+        for(int i=0;i<24;i++){
             hourBins.put(i, 0.0);
         }
     }
+
+    @Override
+    public String toString() {
+        NumberFormat fmt = NumberFormat.getNumberInstance();
+        fmt.setMinimumIntegerDigits(1);
+        fmt.setMinimumFractionDigits(4);
+        fmt.setMaximumFractionDigits(4);
+        StringBuilder builder = new StringBuilder();
+        builder.append(customerId);
+        builder.append(":");
+        for(int i=0;i<hourBins.size();i++){
+            if(i>0){
+                builder.append(",");
+            }
+            builder.append(fmt.format(hourBins.get(i)));
+        }
+        return builder.toString();
+    }
+    
     
 }

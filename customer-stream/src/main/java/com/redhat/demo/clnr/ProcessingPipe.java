@@ -45,8 +45,8 @@ public class ProcessingPipe {
                 .flatMapValues(new MeterReadingParser())
                 .groupByKey(Serialized.with(new Serdes.StringSerde(), new MeterReadingSerde()))
                 .windowedBy(TimeWindows.of(24 * 60 * 60 * 1000))
-                .aggregate(()->0.0, (k,v,a)->a + v.value, Materialized.<String,Double,WindowStore<Bytes, byte[]>>as("sum-store").withValueSerde(Serdes.Double()).withKeySerde(Serdes.String()))
- 
+                //.aggregate(()->0.0, (k,v,a)->a + v.value, Materialized.<String,Double,WindowStore<Bytes, byte[]>>as("sum-store").withValueSerde(Serdes.Double()).withKeySerde(Serdes.String()))
+                .aggregate(()->new CustomerRecord(), (k,v,a)->a.update(v), Materialized.<String,CustomerRecord,WindowStore<Bytes, byte[]>>as("sum-store").withValueSerde(new CustomerRecordSerde()).withKeySerde(Serdes.String()))
                 .toStream()
                 .foreach(new ForeachAction<Object, Object>() {
                     @Override
@@ -54,8 +54,6 @@ public class ProcessingPipe {
                         System.out.println(key + ":" + value);
                     }
                 });
-
-
         return builder.build();
     }
 }

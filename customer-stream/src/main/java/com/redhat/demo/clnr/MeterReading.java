@@ -2,7 +2,9 @@ package com.redhat.demo.clnr;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import sun.util.BuddhistCalendar;
 
 /**
  * Contains a single row from the readings file parsed into sections
@@ -10,6 +12,7 @@ import java.util.Date;
  * @author hhiden
  */
 public class MeterReading implements Serializable {
+    public static final long serialVersionUID = 0L;
     private static final SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
     
     public String customerId;
@@ -33,5 +36,11 @@ public class MeterReading implements Serializable {
     @Override
     public String toString() {
         return customerId + ":" + format.format(timestamp) + "=" + value;
+    }
+    
+    public int getHourOfDay(){
+        Calendar c = Calendar.getInstance();
+        c.setTime(timestamp);
+        return c.get(Calendar.HOUR_OF_DAY);
     }
 }
