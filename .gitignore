@@ -28,6 +28,14 @@ hs_err_pid*
 
 *.DS_Store
 *.iml
-.idea
 */target/*
 /customer-stream/nbproject/
+.idea/
+*.class
+*.iml
+.classpath
+.project
+.settings/
+
+.factorypath
+
