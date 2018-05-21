@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import sun.util.BuddhistCalendar;
 
 /**
  * Contains a single row from the readings file parsed into sections
@@ -47,4 +46,5 @@ public class MeterReading implements Serializable {
     public String formatDate(){
         return format.format(timestamp);
     }
+
 }
