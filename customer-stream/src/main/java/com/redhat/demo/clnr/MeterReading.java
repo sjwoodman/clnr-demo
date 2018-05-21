@@ -43,4 +43,8 @@ public class MeterReading implements Serializable {
         c.setTime(timestamp);
         return c.get(Calendar.HOUR_OF_DAY);
     }
+    
+    public String formatDate(){
+        return format.format(timestamp);
+    }
 }

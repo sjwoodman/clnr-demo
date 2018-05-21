@@ -10,8 +10,9 @@ import io.debezium.kafka.KafkaCluster;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Properties;
 import java.util.logging.Logger;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -20,7 +21,11 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.kafka.streams.KafkaStreams;
+import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsConfig;
+import org.apache.kafka.streams.state.QueryableStoreTypes;
+import org.apache.kafka.streams.state.ReadOnlyWindowStore;
+import org.apache.kafka.streams.state.WindowStoreIterator;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -40,6 +45,7 @@ public class TestStream {
     protected static KafkaCluster cluster;
     protected static File dataDir;
     protected static DataProducer producerThread;
+    protected static QueryThread queryThread;
 
     protected static KafkaCluster kafkaCluster() {
         if (cluster != null) {
@@ -107,8 +113,13 @@ public class TestStream {
         // Create the pipeline
         ProcessingPipe pipe = new ProcessingPipe("stream-meter-readings-input");
         KafkaStreams streams = new KafkaStreams(pipe.getTopology(), props);
+        
         streams.start();
+        
         producerThread.start();
+        Thread.sleep(5000);
+        queryThread = new QueryThread(streams);
+        queryThread.start();
 
         Thread.sleep(60000); //Noooo
         System.exit(0);
@@ -123,6 +134,45 @@ public class TestStream {
         return new KafkaProducer<>(props);
     }
 
+    private static class QueryThread extends Thread {
+        KafkaStreams streams;
+        String key = "120";
+        String startDateText = "13/11/2011 00:00:00";
+        String endDateText= "04/12/2011 23:59:00";
+        
+        public QueryThread(KafkaStreams streams) {
+            this.streams = streams;
+            setDaemon(true);
+        }
+        
+        
+        @Override
+        public void run() {
+            
+            // Query every second
+            try {
+                Date startDate = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(startDateText);
+                Date endDate = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(endDateText);
+                
+                while(true){
+                    try {
+                        ReadOnlyWindowStore store = streams.store("sum-store", QueryableStoreTypes.windowStore());
+                        WindowStoreIterator i = store.fetch(key, startDate.getTime(), endDate.getTime());
+                        while(i.hasNext()){
+                            KeyValue row = (KeyValue)i.next();
+                            System.out.println(row.value);
+                        }
+                    } catch (Exception e2){
+                        
+                    }
+                    Thread.sleep(5000);
+                }
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        
+    }
     private static class DataProducer extends Thread {
         private String topic;
 
@@ -145,11 +195,11 @@ public class TestStream {
                     while ((row = reader.readLine()) != null) {
                         // Produce a message
                         final ProducerRecord<String, String> record = new ProducerRecord<>(topic, "", row);
-
+                        //Thread.sleep(100);
                         producer.send(record);
                     }
                 }
-            } catch (IOException ioe) {
+            } catch (Exception ioe) {
                 fail(ioe.getMessage());
             }
             logger.info("All data sent");

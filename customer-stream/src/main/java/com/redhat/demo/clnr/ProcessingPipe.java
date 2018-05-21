@@ -16,6 +16,7 @@ import org.apache.kafka.streams.kstream.Aggregator;
 import org.apache.kafka.streams.kstream.ForeachAction;
 import org.apache.kafka.streams.kstream.Initializer;
 import org.apache.kafka.streams.kstream.KStream;
+import org.apache.kafka.streams.kstream.KTable;
 import org.apache.kafka.streams.kstream.Materialized;
 import org.apache.kafka.streams.kstream.Reducer;
 import org.apache.kafka.streams.kstream.Serialized;
@@ -37,7 +38,9 @@ public class ProcessingPipe {
     }
 
     public Topology getTopology() {
-
+        KTable t;
+        
+        
         final StreamsBuilder builder = new StreamsBuilder();
         CSVTimestampExtractor extractor = new CSVTimestampExtractor(3, new SimpleDateFormat("dd/MM/yyyy HH:mm:ss"));
         builder.<String, String>stream(inputStreamName, Consumed.with(Serdes.String(), Serdes.String()).withTimestampExtractor(extractor))
@@ -45,15 +48,10 @@ public class ProcessingPipe {
                 .flatMapValues(new MeterReadingParser())
                 .groupByKey(Serialized.with(new Serdes.StringSerde(), new MeterReadingSerde()))
                 .windowedBy(TimeWindows.of(24 * 60 * 60 * 1000))
-                //.aggregate(()->0.0, (k,v,a)->a + v.value, Materialized.<String,Double,WindowStore<Bytes, byte[]>>as("sum-store").withValueSerde(Serdes.Double()).withKeySerde(Serdes.String()))
                 .aggregate(()->new CustomerRecord(), (k,v,a)->a.update(v), Materialized.<String,CustomerRecord,WindowStore<Bytes, byte[]>>as("sum-store").withValueSerde(new CustomerRecordSerde()).withKeySerde(Serdes.String()))
-                .toStream()
-                .foreach(new ForeachAction<Object, Object>() {
-                    @Override
-                    public void apply(Object key, Object value) {
-                        System.out.println(key + ":" + value);
-                    }
-                });
+                .toStream();
+                //.foreach((k,v)->System.out.println(k+ ":" + v));
+        
         return builder.build();
     }
 }
