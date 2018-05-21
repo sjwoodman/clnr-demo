@@ -5,8 +5,6 @@ import org.aerogear.kafka.cdi.annotation.KafkaConfig;
 import org.aerogear.kafka.cdi.annotation.Producer;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.json.Json;
-import javax.json.JsonObject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -35,9 +33,10 @@ public class IngestAPI {
     @Path("/reading")
     @Consumes("application/json")
     public Response createReading(Reading r) {
+
         logger.fine(r.toString());
 
-        sendReading(r);
+        myproducer.send(OUTPUT_TOPIC, r.getCustomerId(), r);
 
         return Response.created(
                 UriBuilder.fromResource(IngestAPI.class)
@@ -49,30 +48,23 @@ public class IngestAPI {
     @Consumes("text/plain")
     public Response createReading(String csv) {
 
-        logger.info(csv);
-
         String[] parts = csv.split(",");
 
-        if (parts.length != 5) {
+        if (parts.length != 4) {
             logger.warning("Unexpected line length for: " + csv);
             return Response.status(Response.Status.BAD_REQUEST).build();
         } else {
 
-            Reading r = new Reading(parts[0], parts[3], Double.valueOf(parts[4]));
-            sendReading(r);
+            String timestamp = parts[0] + " " + parts[1];
+            Reading r = new Reading(timestamp, parts[2], Double.valueOf(parts[3]));
+            logger.info(r.toString());
 
-            logger.fine(r.toString());
+            myproducer.send(OUTPUT_TOPIC, r.getCustomerId(), r);
 
             return Response.created(
                     UriBuilder.fromResource(IngestAPI.class)
                             .path(String.valueOf(r.getId())).build()).build();
         }
-
-    }
-
-    private void sendReading(Reading r) {
-
-        myproducer.send(OUTPUT_TOPIC, r.getCustomerId(), r);
 
     }
 }
