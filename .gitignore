@@ -39,3 +39,7 @@ hs_err_pid*
 
 .factorypath
 
+#Large CLNR files not to be checked into Git
+large.csv
+medium.csv
+
