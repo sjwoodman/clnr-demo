@@ -1,9 +1,15 @@
 package com.redhat.demo.clnr;
 
 import java.io.Serializable;
+import java.text.DateFormat;
 import java.text.NumberFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import javax.json.Json;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObjectBuilder;
 
 /**
  * Holds summary data for a specific customer
@@ -62,5 +68,20 @@ public class CustomerRecord implements Serializable {
         return builder.toString();
     }
     
-    
+ 
+    public String toJson(Date windowDate){
+        DateFormat dateFmt = DateFormat.getDateInstance();
+        NumberFormat numberFmt = NumberFormat.getNumberInstance();
+        
+        JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
+
+        for(Integer key : hourBins.keySet()){
+            arrayBuilder.add(Json.createObjectBuilder().add(Integer.toString(key), Double.parseDouble(numberFmt.format(hourBins.get(key)))));
+        }
+        return Json.createObjectBuilder()
+            .add("customerId", customerId)
+            .add("date", dateFmt.format(windowDate))
+            .add("data", arrayBuilder)
+            .build().toString();
+    }    
 }

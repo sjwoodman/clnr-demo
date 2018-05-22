@@ -23,6 +23,9 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsConfig;
+import org.apache.kafka.streams.Topology;
+import org.apache.kafka.streams.kstream.ForeachAction;
+import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.state.QueryableStoreTypes;
 import org.apache.kafka.streams.state.ReadOnlyWindowStore;
 import org.apache.kafka.streams.state.WindowStoreIterator;
@@ -112,7 +115,20 @@ public class TestStream {
 
         // Create the pipeline
         ProcessingPipe pipe = new ProcessingPipe("stream-meter-readings-input");
-        KafkaStreams streams = new KafkaStreams(pipe.getTopology(), props);
+
+        Topology t = pipe.build();
+        
+        // Add a stage at the end of the stream to peek at the values
+        // This should provide an integration point with the Kafka CDI library
+        pipe.getOutStream().peek(new ForeachAction<String, String>() {
+            @Override
+            public void apply(String key, String value) {
+                System.out.println(key + ":" + value);
+            }
+        });
+        
+        System.out.println(t.describe());
+        KafkaStreams streams = new KafkaStreams(t, props);
 
         streams.start();
 
