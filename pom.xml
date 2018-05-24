@@ -24,6 +24,7 @@
        <module>ingest-api</module>
        <module>persist-to-db</module>
        <module>customer-stream</module>
+      <module>demand-level-kstream</module>
    </modules>
 
     <dependencyManagement>
