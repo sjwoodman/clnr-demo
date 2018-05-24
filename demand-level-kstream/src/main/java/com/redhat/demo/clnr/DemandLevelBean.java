@@ -1,6 +1,7 @@
 package com.redhat.demo.clnr;
 
 import java.util.Date;
+import java.util.logging.Logger;
 import javax.enterprise.context.ApplicationScoped;
 import org.aerogear.kafka.cdi.annotation.KafkaConfig;
 import org.aerogear.kafka.cdi.annotation.KafkaStream;
@@ -8,6 +9,7 @@ import org.aerogear.kafka.serialization.CafdiSerdes;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.common.utils.Bytes;
 import org.apache.kafka.streams.KeyValue;
+import org.apache.kafka.streams.kstream.ForeachAction;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KeyValueMapper;
 import org.apache.kafka.streams.kstream.Materialized;
@@ -24,6 +26,8 @@ import org.apache.kafka.streams.state.WindowStore;
 @ApplicationScoped
 @KafkaConfig(bootstrapServers = "#{KAFKA_SERVICE_HOST}:#{KAFKA_SERVICE_PORT}")
 public class DemandLevelBean {
+    private static final Logger logger = Logger.getLogger(DemandLevelBean.class.getName());
+    
     @KafkaStream(input="ingest.api.out", output="demand.out")
     public KStream<String, DemandLevel> demandStream(final KStream<String, MeterReading> source) {
         return source
@@ -42,7 +46,7 @@ public class DemandLevelBean {
                         return new KeyValue<>("DEMAND", new DemandLevel(new Date(key.window().start()), value));
                     }
                 }
-                );
+                ).peek((k, v)->logger.info(v.toString()));
 
     }
 }

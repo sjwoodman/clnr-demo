@@ -1,6 +1,8 @@
 package com.redhat.demo.clnr;
 
 import java.io.Serializable;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -8,6 +10,8 @@ import java.util.Date;
  * @author hhiden
  */
 public class DemandLevel implements Serializable {
+    private static DateFormat format = SimpleDateFormat.getDateTimeInstance();
+    
     public Date timestamp;
     public double demand;
 
@@ -34,5 +38,9 @@ public class DemandLevel implements Serializable {
     public void setTimestamp(Date timestamp) {
         this.timestamp = timestamp;
     }
-    
+
+    @Override
+    public String toString() {
+        return format.format(timestamp) + " --" + demand + " KWh";
+    }
 }
