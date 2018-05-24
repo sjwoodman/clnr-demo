@@ -23,6 +23,7 @@
    <modules>
        <module>ingest-api</module>
        <module>persist-to-db</module>
+       <module>customer-stream</module>
    </modules>
 
     <dependencyManagement>
