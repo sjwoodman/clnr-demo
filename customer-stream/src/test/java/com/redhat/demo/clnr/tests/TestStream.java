@@ -5,6 +5,8 @@
  */
 package com.redhat.demo.clnr.tests;
 
+import com.redhat.demo.clnr.CustomerRecord;
+import com.redhat.demo.clnr.MeterReading;
 import com.redhat.demo.clnr.ProcessingPipe;
 import io.debezium.kafka.KafkaCluster;
 import java.io.BufferedReader;
@@ -15,6 +17,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
 import java.util.logging.Logger;
+import org.aerogear.kafka.serialization.CafdiSerdes;
+import org.aerogear.kafka.serialization.GenericSerializer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -25,7 +29,6 @@ import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.ForeachAction;
-import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.state.QueryableStoreTypes;
 import org.apache.kafka.streams.state.ReadOnlyWindowStore;
 import org.apache.kafka.streams.state.WindowStoreIterator;
@@ -110,7 +113,7 @@ public class TestStream {
         props.put(StreamsConfig.APPLICATION_ID_CONFIG, "meter-readings");
         props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         props.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
-        props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
+        props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, CafdiSerdes.String().getClass());
         props.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, 1000);
 
         // Create the pipeline
@@ -120,9 +123,9 @@ public class TestStream {
         
         // Add a stage at the end of the stream to peek at the values
         // This should provide an integration point with the Kafka CDI library
-        pipe.getOutStream().peek(new ForeachAction<String, String>() {
+        pipe.getOutStream().peek(new ForeachAction<String, CustomerRecord>() {
             @Override
-            public void apply(String key, String value) {
+            public void apply(String key, CustomerRecord value) {
                 System.out.println(key + ":" + value);
             }
         });
@@ -134,19 +137,19 @@ public class TestStream {
 
         producerThread.start();
         Thread.sleep(5000);
-        queryThread = new QueryThread(streams);
-        queryThread.start();
+        //queryThread = new QueryThread(streams);
+        //queryThread.start();
 
         Thread.sleep(60000); //Noooo
         System.exit(0);
     }
 
-    private static KafkaProducer<String, String> createProducer() {
+    private static KafkaProducer<String, MeterReading> createProducer() {
         Properties props = new Properties();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         props.put(ProducerConfig.CLIENT_ID_CONFIG, "meter-readings-producer");
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, GenericSerializer.class.getName());
         return new KafkaProducer<>(props);
     }
 
@@ -195,13 +198,13 @@ public class TestStream {
             File dataFile = new File(url.getFile());
             logger.info(dataFile.getPath());
 
-            KafkaProducer<String, String> producer = createProducer();
+            KafkaProducer<String, MeterReading> producer = createProducer();
             try (FileReader fileReader = new FileReader(dataFile)) {
                 try (BufferedReader reader = new BufferedReader(fileReader)) {
                     String row;
                     while ((row = reader.readLine()) != null) {
                         // Produce a message
-                        final ProducerRecord<String, String> record = new ProducerRecord<>(topic, "", row);
+                        final ProducerRecord<String, MeterReading> record = new ProducerRecord<>(topic, "", new MeterReading(row));
                         //Thread.sleep(100);
                         producer.send(record);
                     }
