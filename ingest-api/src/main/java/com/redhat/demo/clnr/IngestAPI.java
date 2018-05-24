@@ -55,8 +55,8 @@ public class IngestAPI {
             return Response.status(Response.Status.BAD_REQUEST).build();
         } else {
 
-            String timestamp = parts[0] + " " + parts[1];
-            Reading r = new Reading(timestamp, parts[2], Double.valueOf(parts[3]));
+            String timestamp = (parts[0] + " " + parts[1]).replace(".", "/");
+            Reading r = new Reading(parts[2], timestamp, Double.valueOf(parts[3]));
             logger.info(r.toString());
 
             myproducer.send(OUTPUT_TOPIC, r.getCustomerId(), r);
