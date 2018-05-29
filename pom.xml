@@ -25,6 +25,7 @@
        <module>persist-to-db</module>
        <module>customer-stream</module>
       <module>demand-level-kstream</module>
+      <module>demand-meter</module>
    </modules>
 
     <dependencyManagement>

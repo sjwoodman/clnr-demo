@@ -58,6 +58,15 @@ public class MeterReading implements Serializable {
     public void setTimestamp(Date timestamp) {
         this.timestamp = timestamp;
     }
+    
+    @JsonIgnore
+    public void setTimestamp(String timestamp){
+        try {
+            this.timestamp = format.parse(timestamp);
+        } catch (Exception e){
+            System.out.println("Timestamp parse error: " + timestamp);
+        }
+    }
 
     public void setValue(double value) {
         this.value = value;

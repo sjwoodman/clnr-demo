@@ -3,6 +3,7 @@ package com.redhat.demo.clnr;
 import java.util.Date;
 import java.util.logging.Logger;
 import javax.enterprise.context.ApplicationScoped;
+import javax.json.JsonObject;
 import org.aerogear.kafka.cdi.annotation.KafkaConfig;
 import org.aerogear.kafka.cdi.annotation.KafkaStream;
 import org.aerogear.kafka.serialization.CafdiSerdes;
@@ -28,21 +29,30 @@ public class DemandLevelBean {
     private static final Logger logger = Logger.getLogger(DemandLevelBean.class.getName());
     
     @KafkaStream(input="ingest.api.out", output="demand.out")
-    public KStream<String, DemandLevel> demandStream(final KStream<String, MeterReading> source) {
+    public KStream<String, Long> demandStream(final KStream<String, JsonObject> source) {
         return source
+                .peek((arg0, arg1) -> {
+                    System.out.println(arg1.toString());
+                })
                 .selectKey((key, value) -> {
                     return "ALL";
-                })
+                }).map((key, value) -> {
+                   MeterReading mr = new MeterReading();
+                   mr.setCustomerId(value.getString("customerId"));
+                   mr.setTimestamp(value.getString("timestamp"));
+                   mr.setValue(value.getJsonNumber("kWh").doubleValue());
+                   return new KeyValue<>(key, mr);
+               })
                 .groupByKey(Serialized.with(new Serdes.StringSerde(), CafdiSerdes.Generic(MeterReading.class)))
                 .windowedBy(TimeWindows.of(1 * 60 * 60 * 1000).until(1 * 60 * 60 * 1000))
                 .aggregate(() -> 0.0, (k, v, a) -> a + v.value,
                         Materialized.<String, Double, WindowStore<Bytes, byte[]>>as("demand-store")
                                 .withValueSerde(Serdes.Double())
                                 .withKeySerde(Serdes.String()))
-                .toStream().map(new KeyValueMapper<Windowed<String>, Double, KeyValue<String, DemandLevel>>() {
+                .toStream().map(new KeyValueMapper<Windowed<String>, Double, KeyValue<String, Long>>() {
                     @Override
-                    public KeyValue<String, DemandLevel> apply(Windowed<String> key, Double value) {
-                        return new KeyValue<>("DEMAND", new DemandLevel(new Date(key.window().start()), value));
+                    public KeyValue<String, Long> apply(Windowed<String> key, Double value) {
+                        return new KeyValue<>("DEMAND", (long)(value * 100.0));
                     }
                 }
                 ).peek((k, v)->logger.info(v.toString()));
