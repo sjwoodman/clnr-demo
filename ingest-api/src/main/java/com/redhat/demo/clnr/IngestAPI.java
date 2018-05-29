@@ -9,6 +9,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.util.logging.Logger;
+import org.apache.kafka.clients.producer.ProducerRecord;
 
 @ApplicationScoped
 @Path("/clnr")
@@ -35,9 +36,9 @@ public class IngestAPI {
     public Response createReading(Reading r) {
 
         logger.fine(r.toString());
-
+        
         myproducer.send(OUTPUT_TOPIC, r.getCustomerId(), r);
-
+        
         return Response.created(
                 UriBuilder.fromResource(IngestAPI.class)
                         .path(String.valueOf(r.getId())).build()).build();

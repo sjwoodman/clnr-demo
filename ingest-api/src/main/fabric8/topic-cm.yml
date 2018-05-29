@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: ingest.api.out
+  name: ingest.api.out.hh
   labels:
     strimzi.io/kind: topic
     strimzi.io/cluster: my-cluster
 data:
-  name: ingest.api.out
+  name: ingest.api.out.hh
   partitions: "2"
   replicas: "1"
 

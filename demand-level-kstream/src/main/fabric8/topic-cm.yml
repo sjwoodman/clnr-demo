@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: demand.out
+  name: demand.out.hh
   labels:
     strimzi.io/kind: topic
     strimzi.io/cluster: my-cluster
 data:
-  name: demand.out
-  partitions: "1"
+  name: demand.out.hh
+  partitions: "2"
   replicas: "1"
 

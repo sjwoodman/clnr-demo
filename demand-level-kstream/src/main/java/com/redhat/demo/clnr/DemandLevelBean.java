@@ -1,9 +1,12 @@
 package com.redhat.demo.clnr;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Logger;
 import javax.enterprise.context.ApplicationScoped;
+import javax.json.Json;
 import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import org.aerogear.kafka.cdi.annotation.KafkaConfig;
 import org.aerogear.kafka.cdi.annotation.KafkaStream;
 import org.aerogear.kafka.serialization.CafdiSerdes;
@@ -27,13 +30,12 @@ import org.apache.kafka.streams.state.WindowStore;
 @KafkaConfig(bootstrapServers = "#{KAFKA_SERVICE_HOST}:#{KAFKA_SERVICE_PORT}")
 public class DemandLevelBean {
     private static final Logger logger = Logger.getLogger(DemandLevelBean.class.getName());
+    private static final SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");    
     
-    @KafkaStream(input="ingest.api.out", output="demand.out")
-    public KStream<String, Long> demandStream(final KStream<String, JsonObject> source) {
+    @KafkaStream(input="ingest.api.out.hh", output="demand.out.hh")
+    public KStream<String, JsonObject> demandStream(final KStream<String, JsonObject> source) {
         return source
-                .peek((arg0, arg1) -> {
-                    System.out.println(arg1.toString());
-                })
+                /*.peek((k, v)->v.toString())*/
                 .selectKey((key, value) -> {
                     return "ALL";
                 }).map((key, value) -> {
@@ -49,10 +51,14 @@ public class DemandLevelBean {
                         Materialized.<String, Double, WindowStore<Bytes, byte[]>>as("demand-store")
                                 .withValueSerde(Serdes.Double())
                                 .withKeySerde(Serdes.String()))
-                .toStream().map(new KeyValueMapper<Windowed<String>, Double, KeyValue<String, Long>>() {
+                .toStream().map(new KeyValueMapper<Windowed<String>, Double, KeyValue<String, JsonObject>>() {
                     @Override
-                    public KeyValue<String, Long> apply(Windowed<String> key, Double value) {
-                        return new KeyValue<>("DEMAND", (long)(value * 100.0));
+                    public KeyValue<String, JsonObject> apply(Windowed<String> key, Double value) {
+                        JsonObjectBuilder builder = Json.createObjectBuilder();
+                        builder.add("timestamp", format.format(new Date(key.window().start())))
+                                .add("demand", value);
+                        
+                        return new KeyValue<>("DEMAND", builder.build());
                     }
                 }
                 ).peek((k, v)->logger.info(v.toString()));

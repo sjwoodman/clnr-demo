@@ -62,7 +62,6 @@
                     <plugin>
                         <groupId>io.fabric8</groupId>
                         <artifactId>fabric8-maven-plugin</artifactId>
-                        <version>${version.fmp}</version>
                         <executions>
                             <execution>
                                 <goals>

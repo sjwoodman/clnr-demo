@@ -140,8 +140,8 @@ public class TestStream {
         //queryThread = new QueryThread(streams);
         //queryThread.start();
 
-        Thread.sleep(60000); //Noooo
-        System.exit(0);
+        Thread.sleep(10000); //Noooo
+        //System.exit(0);
     }
 
     private static KafkaProducer<String, MeterReading> createProducer() {
