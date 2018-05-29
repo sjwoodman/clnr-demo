@@ -12,4 +12,4 @@ spec:
             - name: KAFKA_SERVICE_PORT
               value: "9092"
             - name: INGEST_API_OUT
-              value: "ingest.api.out.hh"
+              value: "ingest.api.out"

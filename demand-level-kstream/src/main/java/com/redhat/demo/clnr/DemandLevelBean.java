@@ -32,7 +32,7 @@ public class DemandLevelBean {
     private static final Logger logger = Logger.getLogger(DemandLevelBean.class.getName());
     private static final SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");    
     
-    @KafkaStream(input="ingest.api.out.hh", output="demand.out.hh")
+    @KafkaStream(input="ingest.api.out", output="demand.out")
     public KStream<String, JsonObject> demandStream(final KStream<String, JsonObject> source) {
         return source
                 /*.peek((k, v)->v.toString())*/
