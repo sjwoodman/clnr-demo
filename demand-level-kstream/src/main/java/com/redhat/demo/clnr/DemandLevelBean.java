@@ -1,6 +1,7 @@
 package com.redhat.demo.clnr;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.logging.Logger;
 import javax.enterprise.context.ApplicationScoped;
@@ -30,7 +31,9 @@ import org.apache.kafka.streams.state.WindowStore;
 @KafkaConfig(bootstrapServers = "#{KAFKA_SERVICE_HOST}:#{KAFKA_SERVICE_PORT}")
 public class DemandLevelBean {
     private static final Logger logger = Logger.getLogger(DemandLevelBean.class.getName());
-    private static final SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");    
+    private static final SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss"); 
+    private static final SimpleDateFormat dayFormat = new SimpleDateFormat("dd/MM/yyyy");
+    private static final SimpleDateFormat hourFormat = new SimpleDateFormat("HH");
     
     @KafkaStream(input="ingest.api.out", output="demand.out")
     public KStream<String, JsonObject> demandStream(final KStream<String, JsonObject> source) {
@@ -54,8 +57,12 @@ public class DemandLevelBean {
                 .toStream().map(new KeyValueMapper<Windowed<String>, Double, KeyValue<String, JsonObject>>() {
                     @Override
                     public KeyValue<String, JsonObject> apply(Windowed<String> key, Double value) {
+                        
                         JsonObjectBuilder builder = Json.createObjectBuilder();
-                        builder.add("timestamp", format.format(new Date(key.window().start())))
+                        builder.add("timedate", format.format(new Date(key.window().start())))
+                                .add("hour", hourFormat.format(new Date(key.window().start())))
+                                .add("day", dayFormat.format(new Date(key.window().start())))
+                                .add("timestamp", key.window().start())
                                 .add("demand", value);
                         
                         return new KeyValue<>("DEMAND", builder.build());
