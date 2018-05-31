@@ -10,7 +10,7 @@ do
 
         echo $line;
         curl -d "$line" -H "Content-Type: text/plain" -s -o /dev/null -w "%{http_code}\n" -X POST http://${INGEST_URL}/clnr/reading/csv
-        sleep 0.1
+        sleep 0.02
 
     fi
 done

@@ -18,7 +18,7 @@
             <h1>Current demand running total:</h1>
             <span id="result"></span>
 
-            <div id="donut-chart-5"></div>
+            <div id="chart"></div>
         </div>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -29,6 +29,27 @@
 
 
         <script>
+            var chart = c3.generate({
+                bindto: '#chart',
+                data:{
+                    x: 'x',
+                    columns: [
+                      ['x', '0'],
+                      ['kWh', '0']
+                    ],
+                    type: 'bar'
+                },
+                axis: {
+                    x: {
+                        type: 'category' // this needed to load string x value
+                    },
+                    y: {
+                        min: 0,
+                        max: 500
+                    }
+                } 
+            });
+
             var demandHistory = {};
 
             var port = "";
@@ -52,20 +73,26 @@
                 updateGraph(JSON.parse(message.data));
             };
 
-            function updateGraph(demandLevel){
+            function updateGraph(demandLevel) {
                 demandHistory[demandLevel.timedate] = demandLevel.demand;
-                
+
                 var xData = Object.keys(demandHistory);
-                var yData = new Array();
                 var ySeries = new Array();
+                var xSeries = new Array();
                 ySeries.push("kWh");
-                for(var i=0;i<xData.length;i++){
-                    ySeries.push(demandHistory[keys[i]]);
+                xSeries.push("x");
+                for (var i = 0; i < xData.length; i++) {
+                    xSeries.push(xData[i]);
+                    ySeries.push(demandHistory[xData[i]]);
                 }
-                yData.push(ySeries);
-                
+
+                chart.load({
+                    columns: [
+                        xSeries, ySeries
+                    ]
+                });
             }
-            
+
         </script>        
     </body>
 </html>
