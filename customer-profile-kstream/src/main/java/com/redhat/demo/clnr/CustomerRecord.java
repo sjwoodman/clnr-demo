@@ -13,6 +13,7 @@ public class CustomerRecord implements Serializable {
     public static final long serialVersionUID = 0L;
     public String customerId;
     public HashMap<Integer, Double> hourBins = new HashMap<>();
+    public HashMap<Integer, Integer> updateCount = new HashMap<>();
     public Date windowStart;
 
     public CustomerRecord() {
@@ -31,7 +32,12 @@ public class CustomerRecord implements Serializable {
             }
             int hour = reading.getHourOfDay();
             double existing = hourBins.get(hour);
-            hourBins.put(hour, existing + reading.value);
+            int count = updateCount.get(hour);
+            count++;
+            double newReading = (existing + reading.value) / (count );
+            updateCount.put(hour, count);
+            
+            hourBins.put(hour, newReading);
             return this;
         } catch (Exception e){
             System.out.println(e.getMessage());
@@ -42,6 +48,7 @@ public class CustomerRecord implements Serializable {
     private void initHourBins(){
         for(int i=0;i<24;i++){
             hourBins.put(i, 0.0);
+            updateCount.put(i, 0);
         }
     }
 

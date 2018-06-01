@@ -7,6 +7,16 @@ spec:
     spec:
       containers:
         - env:
+            - name: DB_USERNAME
+              valueFrom:
+                 secretKeyRef:
+                   name: mongo-database-secret
+                   key: user
+            - name: DB_PASSWORD
+              valueFrom:
+                 secretKeyRef:
+                   name: mongo-database-secret
+                   key: password            
             - name: KAFKA_SERVICE_HOST
               value: "my-cluster-kafka"
             - name: KAFKA_SERVICE_PORT
