@@ -22,8 +22,10 @@ import org.bson.Document;
  * Attach to a KStream and persist data into MongoDB
  * @author hhiden
  */
+/*
 @ApplicationScoped
 @KafkaConfig(bootstrapServers = "#{KAFKA_SERVICE_HOST}:#{KAFKA_SERVICE_PORT}")
+*/
 public class CustomerRecordMongoPersist {
     private static final Logger logger = Logger.getLogger(CustomerRecordMongoPersist.class.getName());
     
