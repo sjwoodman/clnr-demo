@@ -33,15 +33,25 @@ public class CustomerRecordMongoPersist {
     MongoCollection<Document> profilesCollection;
 
     public CustomerRecordMongoPersist() {
-        logger.info("Connecting to Mongo");
-        MongoCredential credential = MongoCredential.createCredential("mongo", "profiles", "mongo".toCharArray());
-        
-        client = MongoClients.create(MongoClientSettings.builder()
-                .applyToClusterSettings(builder -> 
-                        builder.hosts(Arrays.asList(new ServerAddress("mongodb", 27017)))).credential(credential).build());
-        db = client.getDatabase("profiles");
-        profilesCollection = db.getCollection("customers");
-        logger.info("Mongo connected");
+
+    }
+    
+    /** Get the mongo collection */
+    private synchronized MongoCollection getProfilesCollection(){
+        if(profilesCollection!=null){
+            return profilesCollection;
+        } else {
+            logger.info("Connecting to Mongo");
+            MongoCredential credential = MongoCredential.createCredential("mongo", "profiles", "mongo".toCharArray());
+
+            client = MongoClients.create(MongoClientSettings.builder()
+                    .applyToClusterSettings(builder -> 
+                            builder.hosts(Arrays.asList(new ServerAddress("mongodb", 27017)))).credential(credential).build());
+            db = client.getDatabase("profiles");
+            profilesCollection = db.getCollection("customers");
+            logger.info("Mongo connected");      
+            return profilesCollection;
+        }
     }
     
     /** Respond to customer profile updates */
@@ -51,22 +61,15 @@ public class CustomerRecordMongoPersist {
             Document doc = Document.parse(value);
             String customerId = doc.getString("customerId");
             Document query = new Document("customerId", customerId);
-            Iterator<Document> docs = profilesCollection.find(query).iterator();
+            Iterator<Document> docs = getProfilesCollection().find(query).iterator();
             if(docs.hasNext()){
                 // Already one 
-                profilesCollection.findOneAndReplace(query, doc);
+                getProfilesCollection().findOneAndReplace(query, doc);
             } else {
                 // Add
-                profilesCollection.insertOne(doc);
+                getProfilesCollection().insertOne(doc);
             }
             
-            /*
-            Document updated = profilesCollection.findOneAndUpdate(new Document("customerId", customerId), doc);
-            if(updated==null){
-                logger.info("Added customer record: " + doc.getString("customerId"));
-                profilesCollection.insertOne(doc);
-            }
-            */
         } catch(Exception e){
             System.out.println(e.getMessage());
         }
