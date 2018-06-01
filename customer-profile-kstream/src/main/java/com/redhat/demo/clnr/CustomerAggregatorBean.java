@@ -1,6 +1,7 @@
 package com.redhat.demo.clnr;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.json.JsonObject;
 import org.aerogear.kafka.cdi.annotation.KafkaConfig;
@@ -46,5 +47,10 @@ public class CustomerAggregatorBean {
                     }
                     return new KeyValue<>(v.customerId, json);                    
                 });
+    }
+    
+    @PostConstruct
+    public void init(){
+        System.out.println("CustomerAggregatorBean.init");
     }
 }
