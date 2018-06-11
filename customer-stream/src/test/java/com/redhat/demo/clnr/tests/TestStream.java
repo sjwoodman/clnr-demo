@@ -134,14 +134,15 @@ public class TestStream {
         KafkaStreams streams = new KafkaStreams(t, props);
 
         streams.start();
+        
 
         producerThread.start();
         Thread.sleep(5000);
         //queryThread = new QueryThread(streams);
         //queryThread.start();
 
-        Thread.sleep(60000); //Noooo
-        System.exit(0);
+        Thread.sleep(10000); //Noooo
+        //System.exit(0);
     }
 
     private static KafkaProducer<String, MeterReading> createProducer() {
@@ -171,6 +172,7 @@ public class TestStream {
                 Date startDate = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(startDateText);
                 Date endDate = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(endDateText);                
                 ReadOnlyWindowStore store = streams.store("sum-store", QueryableStoreTypes.windowStore());
+
                 WindowStoreIterator i = store.fetch(key, startDate.getTime(), endDate.getTime());
                 while (i.hasNext()) {
                     KeyValue row = (KeyValue) i.next();

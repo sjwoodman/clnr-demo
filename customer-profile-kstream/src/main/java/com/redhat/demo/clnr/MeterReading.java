@@ -15,7 +15,7 @@ public class MeterReading implements Serializable {
     public static final long serialVersionUID = 0L;
     
     @JsonIgnore
-    private static final SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+    private static final SimpleDateFormat format = new SimpleDateFormat("yyyy/dd/MM HH:mm:ss");
     
     public String customerId;
     public Date timestamp;
@@ -71,7 +71,10 @@ public class MeterReading implements Serializable {
     public void setValue(double value) {
         this.value = value;
     }
-    
+
+    public double getValue() {
+        return value;
+    }
     
     @JsonIgnore
     public int getHourOfDay(){

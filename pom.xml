@@ -25,6 +25,8 @@
        <module>persist-to-db</module>
        <module>customer-stream</module>
       <module>demand-level-kstream</module>
+      <module>demand-meter</module>
+      <module>customer-profile-kstream</module>
    </modules>
 
     <dependencyManagement>
@@ -78,6 +80,7 @@
 
             <plugin>
                 <artifactId>maven-war-plugin</artifactId>
+                <version>3.2.1</version>
                 <configuration>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                     <attachClasses>true</attachClasses>

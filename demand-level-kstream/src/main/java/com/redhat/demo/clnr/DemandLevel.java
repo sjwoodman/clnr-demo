@@ -10,20 +10,20 @@ import java.util.Date;
  * @author hhiden
  */
 public class DemandLevel implements Serializable {
-    private static DateFormat format = SimpleDateFormat.getDateTimeInstance();
+    private static final long serialVersionUID = 1L;
     
-    public Date timestamp;
+    public String timestamp;
     public double demand;
 
     public DemandLevel() {
     }
 
-    public DemandLevel(Date timestamp, double demand) {
+    public DemandLevel(String timestamp, double demand) {
         this.timestamp = timestamp;
         this.demand = demand;
     }
 
-    public Date getTimestamp() {
+    public String getTimestamp() {
         return timestamp;
     }
 
@@ -35,12 +35,12 @@ public class DemandLevel implements Serializable {
         return demand;
     }
 
-    public void setTimestamp(Date timestamp) {
+    public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
     }
 
     @Override
     public String toString() {
-        return format.format(timestamp) + " --" + demand + " KWh";
+        return timestamp + " --" + demand + " KWh";
     }
 }
