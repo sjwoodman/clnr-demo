@@ -2,6 +2,7 @@ package com.redhat.demo.clnr;
 
 import com.redhat.demo.clnr.cloudevents.KafkaHeaderUtil;
 import io.streamzi.cloudevents.CloudEvent;
+import io.streamzi.cloudevents.impl.CloudEventImpl;
 import org.aerogear.kafka.SimpleKafkaProducer;
 import org.aerogear.kafka.cdi.annotation.KafkaConfig;
 import org.aerogear.kafka.cdi.annotation.Producer;
@@ -54,7 +55,7 @@ public class IngestAPI {
     @POST
     @Path("/ce")
     @Consumes("application/json")
-    public Response createReading(CloudEvent ce) {
+    public Response createReading(CloudEventImpl ce) {
 
         Reading r = new Reading();
 
