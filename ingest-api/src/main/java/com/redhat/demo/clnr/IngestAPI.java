@@ -55,7 +55,7 @@ public class IngestAPI {
     @POST
     @Path("/ce")
     @Consumes("application/json")
-    public Response createReading(CloudEventImpl ce) {
+    public Response createReading(CloudEvent ce) {
 
         Reading r = new Reading();
 

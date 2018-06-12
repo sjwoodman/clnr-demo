@@ -18,7 +18,7 @@ public class KafkaHeaderUtil {
     public static final String SCHEMA_URL = "SchemaURL";
     public static final String CONTENT_TYPE = "ContentType";
 
-    public static Iterable<Header> getHeaders(CloudEventImpl ce) {
+    public static Iterable<Header> getHeaders(CloudEvent ce) {
 
         List<Header> headers = new ArrayList<>();
 
