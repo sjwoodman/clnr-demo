@@ -1,5 +1,6 @@
 package com.redhat.demo.clnr.cloudevents;
 
+import io.streamzi.cloudevents.CloudEvent;
 import io.streamzi.cloudevents.impl.CloudEventImpl;
 import org.apache.kafka.common.header.Header;
 import org.apache.kafka.common.header.internals.RecordHeader;
@@ -7,7 +8,7 @@ import org.apache.kafka.common.header.internals.RecordHeader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CloudEventHeaderMapper {
+public class KafkaHeaderUtil {
 
     public static final String EVENT_TYPE = "EventType";
     public static final String CLOUDEVENTS_VERSION = "CloudEventsVersion";
@@ -17,7 +18,7 @@ public class CloudEventHeaderMapper {
     public static final String SCHEMA_URL = "SchemaURL";
     public static final String CONTENT_TYPE = "ContentType";
 
-    public static Iterable<Header> getHeaders(CloudEventImpl ce) {
+    public static Iterable<Header> getHeaders(CloudEvent ce) {
 
         List<Header> headers = new ArrayList<>();
 

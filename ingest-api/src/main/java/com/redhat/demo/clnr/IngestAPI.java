@@ -1,7 +1,7 @@
 package com.redhat.demo.clnr;
 
-import com.redhat.demo.clnr.cloudevents.CloudEventHeaderMapper;
-import io.streamzi.cloudevents.impl.CloudEventImpl;
+import com.redhat.demo.clnr.cloudevents.KafkaHeaderUtil;
+import io.streamzi.cloudevents.CloudEvent;
 import org.aerogear.kafka.SimpleKafkaProducer;
 import org.aerogear.kafka.cdi.annotation.KafkaConfig;
 import org.aerogear.kafka.cdi.annotation.Producer;
@@ -54,12 +54,12 @@ public class IngestAPI {
     @POST
     @Path("/ce")
     @Consumes("application/json")
-    public Response createReading(CloudEventImpl ce) {
+    public Response createReading(CloudEvent ce) {
 
         Reading r = new Reading();
 
         //headers
-        Iterable<Header> headers = CloudEventHeaderMapper.getHeaders(ce);
+        Iterable<Header> headers = KafkaHeaderUtil.getHeaders(ce);
 
         if (ce.getData().isPresent()) {
 
@@ -121,7 +121,6 @@ public class IngestAPI {
         ZonedDateTime zd = ZonedDateTime.parse(r.getTimestamp(), format);
 
         long timestamp = zd.toInstant().toEpochMilli();
-
 
         ProducerRecord<String, Reading> record = new ProducerRecord<>(OUTPUT_TOPIC, null, timestamp, r.getCustomerId(), r, headers);
         ((org.apache.kafka.clients.producer.Producer) myproducer).send(record);
