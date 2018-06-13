@@ -24,7 +24,7 @@ do
 
         curl -d "$cloudevent" -H "Content-Type: application/json" -s -o /dev/null -w "%{http_code}\n" -X POST http://${INGEST_URL}/clnr/ce
 
-        sleep 0.02
+        sleep 2
 
     fi
 done

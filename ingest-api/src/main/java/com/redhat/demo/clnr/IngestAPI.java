@@ -1,8 +1,7 @@
 package com.redhat.demo.clnr;
 
-import com.redhat.demo.clnr.cloudevents.KafkaHeaderUtil;
 import io.streamzi.cloudevents.CloudEvent;
-import io.streamzi.cloudevents.impl.CloudEventImpl;
+import io.streamzi.cloudevents.kafka.util.KafkaHeaderUtil;
 import org.aerogear.kafka.SimpleKafkaProducer;
 import org.aerogear.kafka.cdi.annotation.KafkaConfig;
 import org.aerogear.kafka.cdi.annotation.Producer;
@@ -60,7 +59,7 @@ public class IngestAPI {
         Reading r = new Reading();
 
         //headers
-        Iterable<Header> headers = KafkaHeaderUtil.getHeaders(ce);
+        Iterable<Header> headers = KafkaHeaderUtil.extractHeaders(ce);
 
         if (ce.getData().isPresent()) {
 
@@ -124,6 +123,7 @@ public class IngestAPI {
         long timestamp = zd.toInstant().toEpochMilli();
 
         ProducerRecord<String, Reading> record = new ProducerRecord<>(OUTPUT_TOPIC, null, timestamp, r.getCustomerId(), r, headers);
+
         ((org.apache.kafka.clients.producer.Producer) myproducer).send(record);
 
         //myproducer.send(OUTPUT_TOPIC, r.getCustomerId(), r);

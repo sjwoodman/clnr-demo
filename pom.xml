@@ -18,6 +18,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <fabric8.generator.name>redhat-clnr/${project.artifactId}:latest</fabric8.generator.name>
         <version.postgresql>9.4.1207</version.postgresql>
+        <version.jcloudevents>0.0.1-SNAPSHOT</version.jcloudevents>
     </properties>
 
     <modules>
